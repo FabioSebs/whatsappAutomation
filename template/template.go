@@ -1,5 +1,5 @@
 package template
 
 const (
-	JEANLY_WA_MSG = `TESTING`
+	JEANLY_WA_MSG = `TESTING FROM ICCT WHATSAPP SCRIPT`
 )

@@ -8,6 +8,7 @@ import (
 	"unicode"
 
 	"github.com/FabioSebs/whatsappAutomation/recipients"
+	"github.com/FabioSebs/whatsappAutomation/template"
 	waclient "github.com/FabioSebs/whatsappAutomation/wa_client"
 	"github.com/samber/lo"
 	"go.mau.fi/whatsmeow"
@@ -52,7 +53,7 @@ func SendMessage(people recipients.People) (err error) {
 
 	client := waclient.NewWhatsappClient()
 
-	fileData, err := os.ReadFile("./icct.jpg")
+	fileData, err := os.ReadFile("./icct.png")
 	if err != nil {
 		return
 	}
@@ -69,10 +70,10 @@ func SendMessage(people recipients.People) (err error) {
 		}
 
 		message := &waE2E.ImageMessage{
-			Caption:       proto.String("ICCT Caption"),
+			Caption:       proto.String(fmt.Sprintf(template.JEANLY_WA_MSG, person.Name, person.Institution)),
 			URL:           &resp.URL,
 			DirectPath:    &resp.DirectPath,
-			Mimetype:      proto.String("image/jpeg"),
+			Mimetype:      proto.String("image/png"),
 			FileLength:    &resp.FileLength,
 			MediaKey:      resp.MediaKey,
 			FileEncSHA256: resp.FileEncSHA256,
@@ -86,16 +87,16 @@ func SendMessage(people recipients.People) (err error) {
 			return err
 		}
 
-		// chat message
-		chatMsg := fmt.Sprintf(recipients.MOCK_MSG, person.Title, person.Name)
-		if _, err = client.SendMessage(ctx, types.JID{
-			User:   strings.Trim(person.Phone, " "),
-			Server: "s.whatsapp.net",
-		}, &waE2E.Message{
-			Conversation: &chatMsg,
-		}); err != nil {
-			return err
-		}
+		// // chat message
+		// chatMsg := fmt.Sprintf(recipients.MOCK_MSG, person.Title, person.Name)
+		// if _, err = client.SendMessage(ctx, types.JID{
+		// 	User:   strings.Trim(person.Phone, " "),
+		// 	Server: "s.whatsapp.net",
+		// }, &waE2E.Message{
+		// 	Conversation: &chatMsg,
+		// }); err != nil {
+		// 	return err
+		// }
 	}
 
 	return

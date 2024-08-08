@@ -34,9 +34,10 @@ func GetRecipients() People {
 			continue
 		}
 		person := Person{
-			Phone: row[0],
-			Name:  row[1],
-			Title: row[2],
+			Phone:       row[0],
+			Name:        row[1],
+			Title:       row[2],
+			Institution: row[3],
 		}
 		people = append(people, person)
 	}
@@ -45,9 +46,10 @@ func GetRecipients() People {
 }
 
 type Person struct {
-	Phone string
-	Name  string
-	Title string
+	Phone       string
+	Name        string
+	Title       string
+	Institution string
 }
 
 type People []Person
@@ -59,7 +61,7 @@ const (
 var (
 	MOCK_PPL People = People{
 		Person{
-			Phone: "6281807408933",
+			Phone: "‪6281807408933‬",
 			Name:  "Jeanly",
 			Title: "Kak",
 		},

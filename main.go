@@ -21,9 +21,16 @@ func main() {
 	people := recipients.GetRecipients()
 
 	peopleCleaned := lo.Map(people, func(person recipients.Person, idx int) recipients.Person {
-		person.Phone = removeCommas(removeControlCharacters(person.Phone))
+		person.Phone = extractNo(removeCommas(removeControlCharacters(person.Phone)))
 		person.Name = removeControlCharacters(person.Name)
-		person.Title = removeControlCharacters(person.Title)
+		person.Institution = removeControlCharacters(person.Institution)
+		person.Familiar = removeControlCharacters(person.Familiar)
+		contact := recipients.ContactPerson{
+			Title: removeControlCharacters(person.ContactPerson.Title),
+			Name:  removeControlCharacters(person.ContactPerson.Name),
+			Phone: extractNo(removeCommas(removeControlCharacters(person.ContactPerson.Phone))),
+		}
+		person.ContactPerson = contact
 		return person
 	})
 
@@ -46,6 +53,11 @@ func removeCommas(numberStr string) string {
 	return strings.ReplaceAll(numberStr, ",", "")
 }
 
+func extractNo(numberStr string) string {
+	parts := strings.Split(numberStr, "/")
+	return parts[len(parts)-1]
+}
+
 func SendMessage(people recipients.People) (err error) {
 	var (
 		ctx = context.Background()
@@ -64,6 +76,11 @@ func SendMessage(people recipients.People) (err error) {
 	}
 
 	for _, person := range people {
+		// handle familiar
+		if person.Familiar == "Jeanly" {
+			continue
+		}
+
 		toJID := types.JID{
 			User:   person.Phone,
 			Server: types.DefaultUserServer,
@@ -78,6 +95,12 @@ func SendMessage(people recipients.People) (err error) {
 			MediaKey:      resp.MediaKey,
 			FileEncSHA256: resp.FileEncSHA256,
 			FileSHA256:    resp.FileSHA256,
+		}
+
+		// handle cp
+		if person.ContactPerson.Name != "" {
+			toJID.User = person.ContactPerson.Phone
+			message.Caption = proto.String(fmt.Sprintf(template.CP_MSG, person.ContactPerson.Name, person.Name, person.Institution))
 		}
 
 		// media message
